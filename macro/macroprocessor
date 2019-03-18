@@ -1,0 +1,34 @@
+import re
+with open('program.txt') as f:
+  lines=f.readlines()
+
+print(lines)
+
+program,macro_def_table,macro_name_table,ALA=[],[],[],[]
+counter,k,macro_def_table_ptr=0,0,0
+
+for i in lines:
+  x=re.split("[ =,\t\n]",i)
+  x.pop()
+  program.append(x)
+print("\n\nProgram after splitting:",program)
+
+print("Macro Definition:\n")
+for i in range(len(program)):
+  for j in range(len(program[i])):
+    if program[i][j]=="MACRO":
+      flag=True
+      while flag:
+        if not '&' in program[i+1][k]:
+          macro_name_table.append(str(counter)+","+program[i+1][k]+","+str(macro_def_table_ptr))  #Filling the macro name table 
+          flag=False
+        k+=1
+      k=0
+  if not "MACRO" in program[i]:
+    print(program[i])
+    macro_def_table.append([str(macro_def_table_ptr)]+program[i])
+    macro_def_table_ptr+=1  
+
+print("Macro Name Table=\n\n",macro_name_table)
+print("macro_def_table=\n\n",macro_def_table)
+
