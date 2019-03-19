@@ -1,34 +1,163 @@
 import re
+
 with open('program.txt') as f:
-  lines=f.readlines()
+    lines = f.readlines()
 
 print(lines)
 
-program,macro_def_table,macro_name_table,ALA=[],[],[],[]
-counter,k,macro_def_table_ptr=0,0,0
+program, macro_def_table, macro_name_table, ALA = [], [], [], []
+program_without_macro = []
+counter, k, macro_def_table_ptr, ALA_index = 0, 0, 0, 0
 
 for i in lines:
-  x=re.split("[ =,\t\n]",i)
-  x.pop()
-  program.append(x)
-print("\n\nProgram after splitting:",program)
+    x = re.split("[ =,\t\n]", i)
+    x.pop()
+    program.append(x)
+print("\n\nProgram after splitting:", program)
+
+while program[len(program) - 1][0] != "MEND":
+    program_without_macro.append(program.pop())
+
+program_without_macro.reverse()
+
+print("\nProgram definition after poping:", program)
+print("\n\nProgram without macro:", program_without_macro)
 
 print("Macro Definition:\n")
 for i in range(len(program)):
-  for j in range(len(program[i])):
-    if program[i][j]=="MACRO":
-      flag=True
-      while flag:
-        if not '&' in program[i+1][k]:
-          macro_name_table.append(str(counter)+","+program[i+1][k]+","+str(macro_def_table_ptr))  #Filling the macro name table 
-          flag=False
-        k+=1
-      k=0
-  if not "MACRO" in program[i]:
-    print(program[i])
-    macro_def_table.append([str(macro_def_table_ptr)]+program[i])
-    macro_def_table_ptr+=1  
+    for j in range(len(program[i])):
+        if program[i][j] == "MACRO":
+            flag = True
+            while flag:
+                if not '&' in program[i + 1][k]:
+                    macro_name_table.append([str(counter)] + [program[i + 1][k]] + [
+                        str(macro_def_table_ptr)])  # Filling the macro name table
+                    flag = False
+                k += 1
+            k = 0
+    if not "MACRO" in program[i]:
+        # print(program[i])
+        macro_def_table.append([str(macro_def_table_ptr)] + program[i])
+        macro_def_table_ptr += 1
 
-print("Macro Name Table=\n\n",macro_name_table)
-print("macro_def_table=\n\n",macro_def_table)
+print("Macro Name Table=\n\n", macro_name_table)
+print("\n\nmacro_def_table=\n", macro_def_table)
+
+# Filling the ALA
+z=0
+for i in macro_name_table:
+    ALA.append(z)
+    z+=1
+    for j in macro_def_table[int(i[2])]:
+        if '&' in j:
+            ALA.append(j)
+
+print("\nALA=", ALA)
+
+# ==============================================================================================================
+# Pass I processing
+# ==============================================================================================================
+print("\nmacro_def_table=\n\n",macro_def_table)
+
+# Filling the values inside the definition table as positions of the parameters
+i = 0
+while i < len(macro_def_table):
+    # print("i=",i)
+    j = 0
+    while j < len(macro_def_table[i]):
+        if "MEND" in macro_def_table[i][j] and i != len(macro_def_table) - 1:
+            # print("i br=",i)
+            i = i + 2
+            # print("i af=",i)
+            continue
+        if i != 0 and macro_def_table[i - 1][1] != "MEND":
+            if '&' in macro_def_table[i][j]:
+                # print(macro_def_table[i][j])
+                macro_def_table[i][j] = "#" + str(ALA.index(macro_def_table[i][j]))
+        j += 1
+    i += 1
+
+print("\n\nMacro Defintion table after putting the index from the ALA and after pass I:\n")
+for i in macro_def_table:
+    print(i)
+
+# ==============================================================================================================
+# Pass II processing
+# ==============================================================================================================
+
+for i in program_without_macro: #Filling the ALA with the actual parameters
+    for j in i:
+        for k in macro_name_table: #k is the index where the match is found in name table
+            if j in k:  # if any match is found in macro name table
+                # print("Match found=",j)
+                # i
+                # print("Jo index pe macro name table pe macro stored hai=",macro_name_table.index(k))
+                # print("Macro definition table ka pointer:",int(macro_name_table[macro_name_table.index(k)][2]))
+                # starting_index_of_macro_def_tab = int(macro_name_table[macro_name_table.index(k)][2])
+                # l = starting_index_of_macro_def_tab + 1
+                # print("l=",l)
+                # print("macro_def_table[l][1]=",macro_def_table[l][1])
+                MNT_index=macro_name_table.index(k)
+                ALA_index=ALA.index(MNT_index) #Here we found out the which macros ALA has to be filled
+                ALA_index=ALA_index+1
+                print("The found macro definition=")
+                no_of_arguments=len(i)-1 # 1 would be used for storing the macro name
+                for m in i: #i is the index of the program table where the macro is found
+                    if m!=k[1]: #identifying the arguments
+                      ALA[ALA_index]=m
+                      ALA_index=ALA_index+1 
+                      
+print("ALA in second pass=",ALA)
+
+i=0
+while i<len(macro_def_table):
+  if i==0:
+    i+=1
+    continue
+  if macro_def_table[i][1]=="MEND":
+    i=i+2
+    continue
+  j=0
+  while j<len(macro_def_table[i]):
+    if "#" in macro_def_table[i][j]:
+      macro_def_table[i][j]=ALA[int(macro_def_table[i][j][1:])]
+      print("new Macro[i][j]=",macro_def_table[i][j])
+    j+=1
+  i+=1
+
+print("\n\nmacro_def_table after pass II:\n",macro_def_table)
+
+pass2_code=[]
+
+print("\n\n")
+
+
+
+for i in program_without_macro:  #checking any macro call in the code if any macro call is there expanding the call
+  flag=0
+  for j in i:
+    for k in macro_name_table:
+      if j in k:
+        o=int(k[2])+1
+        while macro_def_table[o][1]!="MEND":
+          pass2_code.append(macro_def_table[o])
+          o+=1
+          flag=1
+      if flag==1:
+        break
+    if flag == 1:
+      break
+  if flag!=1:
+    pass2_code.append(i)
+
+          
+
+
+print("\n\nProgram without macro after pass II:")
+for i in pass2_code:
+  print(i)
+          
+
+
+
 
