@@ -89,14 +89,6 @@ for i in program_without_macro: #Filling the ALA with the actual parameters
     for j in i:
         for k in macro_name_table: #k is the index where the match is found in name table
             if j in k:  # if any match is found in macro name table
-                # print("Match found=",j)
-                # i
-                # print("Jo index pe macro name table pe macro stored hai=",macro_name_table.index(k))
-                # print("Macro definition table ka pointer:",int(macro_name_table[macro_name_table.index(k)][2]))
-                # starting_index_of_macro_def_tab = int(macro_name_table[macro_name_table.index(k)][2])
-                # l = starting_index_of_macro_def_tab + 1
-                # print("l=",l)
-                # print("macro_def_table[l][1]=",macro_def_table[l][1])
                 MNT_index=macro_name_table.index(k)
                 ALA_index=ALA.index(MNT_index) #Here we found out the which macros ALA has to be filled
                 ALA_index=ALA_index+1
@@ -131,8 +123,6 @@ pass2_code=[]
 
 print("\n\n")
 
-
-
 for i in program_without_macro:  #checking any macro call in the code if any macro call is there expanding the call
   flag=0
   for j in i:
@@ -149,9 +139,6 @@ for i in program_without_macro:  #checking any macro call in the code if any mac
       break
   if flag!=1:
     pass2_code.append(i)
-
-          
-
 
 print("\n\nProgram without macro after pass II:")
 for i in pass2_code:
