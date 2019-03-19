@@ -3,8 +3,6 @@ import re
 with open('program.txt') as f:
     lines = f.readlines()
 
-print(lines)
-
 program, macro_def_table, macro_name_table, ALA = [], [], [], []
 program_without_macro = []
 counter, k, macro_def_table_ptr, ALA_index = 0, 0, 0, 0
@@ -13,17 +11,26 @@ for i in lines:
     x = re.split("[ =,\t\n]", i)
     x.pop()
     program.append(x)
-print("\n\nProgram after splitting:", program)
+
+
+print("\n\n Read Program:\n")
+for i in program:
+  print(i)
+
 
 while program[len(program) - 1][0] != "MEND":
     program_without_macro.append(program.pop())
 
 program_without_macro.reverse()
 
-print("\nProgram definition after poping:", program)
-print("\n\nProgram without macro:", program_without_macro)
+print("\n\nAll Macro Definitions:\n")
+for i in program:
+  print(i)
 
-print("Macro Definition:\n")
+print("\n\nProgram without macro:\n")
+for i in program_without_macro:
+  print(i)
+
 for i in range(len(program)):
     for j in range(len(program[i])):
         if program[i][j] == "MACRO":
@@ -36,12 +43,16 @@ for i in range(len(program)):
                 k += 1
             k = 0
     if not "MACRO" in program[i]:
-        # print(program[i])
         macro_def_table.append([str(macro_def_table_ptr)] + program[i])
         macro_def_table_ptr += 1
 
-print("Macro Name Table=\n\n", macro_name_table)
-print("\n\nmacro_def_table=\n", macro_def_table)
+print("\n\nMacro Name Table:\n")
+for i in macro_name_table:
+  print(i)
+
+print("\n\nmacro_def_table:\n")
+for i in macro_def_table:
+  print(i)
 
 # Filling the ALA
 z=0
@@ -52,27 +63,24 @@ for i in macro_name_table:
         if '&' in j:
             ALA.append(j)
 
-print("\nALA=", ALA)
+print("\n\nALA:\n")
+for i in ALA:
+  print(i)
 
 # ==============================================================================================================
 # Pass I processing
 # ==============================================================================================================
-print("\nmacro_def_table=\n\n",macro_def_table)
 
 # Filling the values inside the definition table as positions of the parameters
 i = 0
 while i < len(macro_def_table):
-    # print("i=",i)
     j = 0
     while j < len(macro_def_table[i]):
         if "MEND" in macro_def_table[i][j] and i != len(macro_def_table) - 1:
-            # print("i br=",i)
             i = i + 2
-            # print("i af=",i)
             continue
         if i != 0 and macro_def_table[i - 1][1] != "MEND":
             if '&' in macro_def_table[i][j]:
-                # print(macro_def_table[i][j])
                 macro_def_table[i][j] = "#" + str(ALA.index(macro_def_table[i][j]))
         j += 1
     i += 1
@@ -92,14 +100,15 @@ for i in program_without_macro: #Filling the ALA with the actual parameters
                 MNT_index=macro_name_table.index(k)
                 ALA_index=ALA.index(MNT_index) #Here we found out the which macros ALA has to be filled
                 ALA_index=ALA_index+1
-                print("The found macro definition=")
                 no_of_arguments=len(i)-1 # 1 would be used for storing the macro name
                 for m in i: #i is the index of the program table where the macro is found
                     if m!=k[1]: #identifying the arguments
                       ALA[ALA_index]=m
                       ALA_index=ALA_index+1 
                       
-print("ALA in second pass=",ALA)
+print("\n\nALA in second pass:\n")
+for i in ALA:
+  print(i)
 
 i=0
 while i<len(macro_def_table):
@@ -113,11 +122,12 @@ while i<len(macro_def_table):
   while j<len(macro_def_table[i]):
     if "#" in macro_def_table[i][j]:
       macro_def_table[i][j]=ALA[int(macro_def_table[i][j][1:])]
-      print("new Macro[i][j]=",macro_def_table[i][j])
     j+=1
   i+=1
 
-print("\n\nmacro_def_table after pass II:\n",macro_def_table)
+print("\n\nmacro_def_table after pass II:\n")
+for i in macro_def_table:
+  print(i)
 
 pass2_code=[]
 
@@ -139,12 +149,11 @@ for i in program_without_macro:  #checking any macro call in the code if any mac
       break
   if flag!=1:
     pass2_code.append(i)
-
-print("\n\nProgram without macro after pass II:")
+print("************************************************************************************************************************")
+print("\n\nProgram without macro after pass II:\n")
 for i in pass2_code:
   print(i)
           
-
 
 
 
