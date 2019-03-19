@@ -1,10 +1,12 @@
 import re
 
+def printer(a):
+  [print(i) for i in a]    
+
 with open('program.txt') as f:
     lines = f.readlines()
 
-program, macro_def_table, macro_name_table, ALA = [], [], [], []
-program_without_macro = []
+program, macro_def_table, macro_name_table,program_without_macro,pass2_code, ALA = [], [], [], [],[],[]
 counter, k, macro_def_table_ptr, ALA_index = 0, 0, 0, 0
 
 for i in lines:
@@ -12,11 +14,8 @@ for i in lines:
     x.pop()
     program.append(x)
 
-
 print("\n\n Read Program:\n")
-for i in program:
-  print(i)
-
+printer(program)
 
 while program[len(program) - 1][0] != "MEND":
     program_without_macro.append(program.pop())
@@ -24,12 +23,10 @@ while program[len(program) - 1][0] != "MEND":
 program_without_macro.reverse()
 
 print("\n\nAll Macro Definitions:\n")
-for i in program:
-  print(i)
+printer(program)
 
 print("\n\nProgram without macro:\n")
-for i in program_without_macro:
-  print(i)
+printer(program_without_macro)
 
 for i in range(len(program)):
     for j in range(len(program[i])):
@@ -47,12 +44,10 @@ for i in range(len(program)):
         macro_def_table_ptr += 1
 
 print("\n\nMacro Name Table:\n")
-for i in macro_name_table:
-  print(i)
+printer(macro_name_table)
 
 print("\n\nmacro_def_table:\n")
-for i in macro_def_table:
-  print(i)
+printer(macro_def_table)
 
 # Filling the ALA
 z=0
@@ -64,8 +59,7 @@ for i in macro_name_table:
             ALA.append(j)
 
 print("\n\nALA:\n")
-for i in ALA:
-  print(i)
+printer(ALA)
 
 # ==============================================================================================================
 # Pass I processing
@@ -86,8 +80,7 @@ while i < len(macro_def_table):
     i += 1
 
 print("\n\nMacro Defintion table after putting the index from the ALA and after pass I:\n")
-for i in macro_def_table:
-    print(i)
+printer(macro_def_table)
 
 # ==============================================================================================================
 # Pass II processing
@@ -107,8 +100,7 @@ for i in program_without_macro: #Filling the ALA with the actual parameters
                       ALA_index=ALA_index+1 
                       
 print("\n\nALA in second pass:\n")
-for i in ALA:
-  print(i)
+printer(ALA)
 
 i=0
 while i<len(macro_def_table):
@@ -126,12 +118,7 @@ while i<len(macro_def_table):
   i+=1
 
 print("\n\nmacro_def_table after pass II:\n")
-for i in macro_def_table:
-  print(i)
-
-pass2_code=[]
-
-print("\n\n")
+printer(macro_def_table)
 
 for i in program_without_macro:  #checking any macro call in the code if any macro call is there expanding the call
   flag=0
@@ -149,11 +136,9 @@ for i in program_without_macro:  #checking any macro call in the code if any mac
       break
   if flag!=1:
     pass2_code.append(i)
-print("************************************************************************************************************************")
+print("**************************************************************************")
 print("\n\nProgram without macro after pass II:\n")
-for i in pass2_code:
-  print(i)
-          
+printer(pass2_code)          
 
 
 
